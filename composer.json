@@ -34,7 +34,8 @@
         "hyperf/pool": "~1.0.0",
         "hyperf/process": "~1.0.0",
         "hyperf/redis": "~1.0.0",
-        "hyperf/utils": "~1.0.0"
+        "hyperf/utils": "~1.0.0",
+        "qiao520/swoole-logic": "~1.0.0"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",
@@ -55,10 +56,9 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Installer\\": "installer/"
+            "Logic\\": "logic/"
         },
-        "files": [
-        ]
+        "files": []
     },
     "autoload-dev": {
         "psr-4": {
@@ -67,11 +67,8 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "extra": {
-    },
+    "extra": [],
     "scripts": {
-        "pre-install-cmd": "Installer\\Script::install",
-        "pre-update-cmd": "Installer\\Script::install",
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
@@ -84,6 +81,10 @@
         "packagist": {
             "type": "composer",
             "url": "https://packagist.laravel-china.org"
+        },
+        "qiao520/swoole-logic": {
+            "type": "vcs",
+            "url": "https://github.com/qiao520/swoole-logic"
         }
     }
 }

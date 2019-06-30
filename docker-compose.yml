@@ -1,0 +1,9 @@
+version: '2.0'
+services:
+  hyperf:
+    image: "hyperf/hyperf"
+    ports:
+      - "9501:9501"
+    volumes:
+      - ./:/hyperf-skeleton
+    command: ["php", "/hyperf-skeleton/bin/hyperf.php", "start"]

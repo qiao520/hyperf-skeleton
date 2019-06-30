@@ -1,3 +1,32 @@
+## 新增内容有2项内容：
+  - Logic层热启动
+  
+  - 高性能、方便使用的表单验证
+
+#### Logic层热启动
+我新加了一个业务逻辑层（Logic），该层不受服务启动时扫描，会在work进程启动后进行加载，所以，可以通过server->reload接口对代码进行重载，达到热加载效果，不用频繁重启服务，以加快开发调试速度。
+
+热加载演示步骤
+1. 需要先修改\vendor\hyperf\server\src\Server.php文件，增加如下方法，用来获取swoole的server，代码：
+```
+    public function getSwServer()
+    {
+        return $this->server;
+    }
+```
+
+2. 然后给你的IDE配置启动项，新增一个“PHP HTTP Request”启动项，具体设置，自行摸索，摸索了还不行，请联系我（380552499）
+
+3. 启动Hyperf服务，浏览器访问http://192.168.99.100:9501/logic
+
+4. 修改\logic\Form\DemoForm.php逻辑代码，然后点击IDE上的run按钮（快捷键shift+f10），然后再到浏览器查看代码已重载
+
+#### 表单验证
+
+详见：https://github.com/qiao520/swoole-logic
+
+
+
 # 介绍
 
 Hyperf 是基于 `Swoole 4.3+` 实现的高性能、高灵活性的 PHP 持久化框架，内置协程服务器及大量常用的组件，性能较传统基于 `PHP-FPM` 的框架有质的提升，提供超高性能的同时，也保持着极其灵活的可扩展性，标准组件均以最新的 [PSR 标准](https://www.php-fig.org/psr) 实现，基于强大的依赖注入设计可确保框架内的绝大部分组件或类都是可替换的。
