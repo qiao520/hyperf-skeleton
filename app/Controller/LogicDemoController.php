@@ -15,7 +15,7 @@ use Logic\Form\DemoForm;
 class LogicDemoController extends Controller
 {
     /**
-     * 所有参数为非必填
+     * 演示所有参数为非必填
      * @return array
      */
     public function index()
@@ -32,7 +32,7 @@ class LogicDemoController extends Controller
     }
 
     /**
-     * 所有参赛为必填
+     * 演示所有参数为必填
      * @return array
      */
     public function required()
