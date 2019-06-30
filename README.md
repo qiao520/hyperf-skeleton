@@ -1,43 +1,44 @@
-## 新增内容有2项内容：
+# 该仓库新增2项内容：
   - Logic层热启动
-  
   - 高性能、方便使用的表单验证
 
-#### Logic层热启动
-我新加了一个业务逻辑层（Logic），该层不受服务启动时扫描，会在work进程启动后进行加载，所以，可以通过server->reload接口对代码进行重载，达到热加载效果，不用频繁重启服务，以加快开发调试速度。
+###### Logic层热启动，修改业务代码后不用重启能立即生效
 
-热加载演示步骤
-1. 需要先修改\vendor\hyperf\server\src\Server.php文件，增加如下方法，用来获取swoole的server，代码：
+我定义了一个业务逻辑层（Logic），该层不受服务启动时扫描，会在work进程启动后进行加载，所以，可以通过server->reload接口对代码进行重载，达到热加载效果，不用频繁重启服务，以加快开发调试速度。
+
+热加载演示步骤如下：
+1. 下载该仓库代码：git clone https://github.com/qiao520/hyperf-skeleton
+这个仓库代码是fork官方的骨架仓库，并修改了点东西。
+2. 下载依赖包：composer install  
+注意：如果出现安装不了qiao520/swoole-logic，请先执行这个设置命令：composer config repositories.qiao520/swoole-logic vcs https://github.com/qiao520/swoole-logic
+3. 启动服务（具体自行操作）
+4. 需要先修改\vendor\hyperf\server\src\Server.php文件，增加如下方法，用来获取swoole的server，代码：
 ```
     public function getSwServer()
     {
         return $this->server;
     }
 ```
+5. 然后给你的IDE配置启动项，新增一个“PHP HTTP Request”启动项，具体设置，自行摸索，摸索了还不行，请联系我（380552499）
+6. 启动Hyperf服务，浏览器访问http://192.168.99.100:9501/logic
+7. 修改\logic\Form\DemoForm.php逻辑代码，然后点击IDE上的run按钮（快捷键shift+f10），然后再到浏览器查看代码已重载
 
-2. 然后给你的IDE配置启动项，新增一个“PHP HTTP Request”启动项，具体设置，自行摸索，摸索了还不行，请联系我（380552499）
-
-3. 启动Hyperf服务，浏览器访问http://192.168.99.100:9501/logic
-
-4. 修改\logic\Form\DemoForm.php逻辑代码，然后点击IDE上的run按钮（快捷键shift+f10），然后再到浏览器查看代码已重载
-
-#### 表单验证
+###### 表单验证组件
 
 详见：https://github.com/qiao520/swoole-logic
 
 
-
-# 介绍
+# Hyperf介绍
 
 Hyperf 是基于 `Swoole 4.3+` 实现的高性能、高灵活性的 PHP 持久化框架，内置协程服务器及大量常用的组件，性能较传统基于 `PHP-FPM` 的框架有质的提升，提供超高性能的同时，也保持着极其灵活的可扩展性，标准组件均以最新的 [PSR 标准](https://www.php-fig.org/psr) 实现，基于强大的依赖注入设计可确保框架内的绝大部分组件或类都是可替换的。
    
 框架组件库除了常见的协程版的 `MySQL 客户端`、`Redis 客户端`，还为您准备了协程版的 `Eloquent ORM`、`GRPC 服务端及客户端`、`Zipkin (OpenTracing) 客户端`、`Guzzle HTTP 客户端`、`Elasticsearch 客户端`、`Consul 客户端`、`ETCD 客户端`、`AMQP 组件`、`Apollo 配置中心`、`基于令牌桶算法的限流器`、`通用连接池` 等组件的提供也省去了自己去实现对应协程版本的麻烦，并提供了 `依赖注入`、`注解`、`AOP 面向切面编程`、`中间件`、`自定义进程`、`事件管理器`、`简易的 Redis 消息队列和全功能的 RabbitMQ 消息队列` 等非常便捷的功能，满足丰富的技术场景和业务场景，开箱即用。
 
-# 框架初衷
+# Hyperf框架初衷
 
 尽管现在基于 PHP 语言开发的框架处于一个百花争鸣的时代，但仍旧没能看到一个优雅的设计与超高性能的共存的完美框架，亦没有看到一个真正为 PHP 微服务铺路的框架，此为 Hyperf 及其团队成员的初衷，我们将持续投入并为此付出努力，也欢迎你加入我们参与开源建设。
 
-# 设计理念
+# Hyperf设计理念
 
 `Hyperspeed + Flexibility = Hyperf`，从名字上我们就将 `超高速` 和 `灵活性` 作为 Hyperf 的基因。
    
@@ -46,6 +47,6 @@ Hyperf 是基于 `Swoole 4.3+` 实现的高性能、高灵活性的 PHP 持久�
 
 基于以上的特点，Hyperf 将存在丰富的可能性，如实现 Web 服务，网关服务，分布式中间件，微服务架构，游戏服务器，物联网（IOT）等。
 
-# 文档
+# Hyperf文档
 
 [https://doc.hyperf.io/](https://doc.hyperf.io/)
