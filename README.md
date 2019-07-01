@@ -1,9 +1,22 @@
-# 该仓库新增2项内容：
+# 概述
+
+该仓库是Hyperf框架基础上结合swoole-logic组件的一个演示。
+  
+# 什么是swoole-logic组件
+
+为swoole框架设计的务逻辑封装组件，将业务代码抽离出来以减少控制器代码量、代码重载，同时封装了高性能表单数据验证。
+
+我们可以这么理解，一个请求是一个业务，一个业务会对应由一个Form表单类去封装处理。
+一个健全的系统少不了请求参数数据验证、易维护性。这个组件就是为了帮您轻松做这些事情。
+
+主要是解决如下2个问题：
   - Logic层热加载，修改业务代码后不用重启能立即生效
   - 高性能、方便使用的表单验证
 
+
 ---
-# Logic层热加载
+
+# 如何实现Logic层热加载
 
 > 我定义了一个业务逻辑层（Logic），该层不受服务启动时扫描，会在work进程启动后进行加载，所以，可以通过server->reload接口对代码进行重载，达到热加载效果，不用频繁重启服务，以加快开发调试速度。
 
@@ -25,13 +38,15 @@
 7. 修改\logic\Form\DemoForm.php逻辑代码，然后点击IDE上的run按钮（快捷键shift+f10）或者浏览器请求（http://192.168.99.100:9501/reload）
 8. 然后再到浏览器访问http://192.168.99.100:9501/logic，代码已秒重载
 
-# 表单验证
+注：192.168.99.100是我window电脑上安装的虚拟机ip
 
-组件仓库地址：https://github.com/qiao520/swoole-logic
 
-代码示例：
+# 表单验证使用示例
 
-表单DemoForm类
+组件仓库：https://github.com/qiao520/swoole-logic
+组件安装：composer require qiao520/swoole-logic:~1.0.0
+
+表单DemoForm类（示例代码）
 ```
 <?php
 declare(strict_types=1);
