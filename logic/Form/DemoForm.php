@@ -12,10 +12,23 @@ use Roers\SwLogic\BaseForm;
 
 class DemoForm extends BaseForm
 {
+    // 以下是表单属性
     public $name;
+    public $email;
     public $age;
     public $sex;
+    public $others;
+    public $default = 0;
 
+    // 以下是覆盖父类的默认设置
+    protected $isAutoTrim = true;   // 开启自动去空格（默认开启）
+    protected $defaultRequired = true;   // 开启所有属性为必填（默认未开启）
+    protected $defaultErrorMessage = '{attribute}格式错误';  // 覆盖自定义错误提示信息
+
+    /**
+     * 定义验证规则
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -28,10 +41,18 @@ class DemoForm extends BaseForm
             // 使用自定义验证器，验证名字不能重复
             ['name', 'validateName'],
             // 还可以这样用，对多个字段用同一个验证器规则
-            [['age', 'sex'], 'integer']
+            [['age', 'sex'], 'integer'],
+            // 验证邮箱格式，并且必填required对所有校验器都有效
+            [['email'], 'email', 'required' => true],
+            // 验证是否是数组，并对数组元素进行格式校验
+            [['others'], 'array', 'validator' => 'string'],
         ];
     }
 
+    /**
+     * 字段名称映射关系
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -62,22 +83,11 @@ class DemoForm extends BaseForm
     {
         $value = $this->{$attribute};
 
-        $isNameExist = $this->findNameFromDb($value);
-
-        if ($isNameExist) {
+        if ($value == 'Roers.cn') {
             $this->addError($attribute, "名字{$value}已存在");
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * 从数据库查询用户是否存在
-     * @param $name
-     * @return bool
-     */
-    private function findNameFromDb($name) {
-        return $name == 'Roers.cn';
     }
 }
