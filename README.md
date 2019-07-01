@@ -1,18 +1,19 @@
 # 该仓库新增2项内容：
-  - Logic层热启动
+  - Logic层热加载，修改业务代码后不用重启能立即生效
   - 高性能、方便使用的表单验证
 
-###### Logic层热启动，修改业务代码后不用重启能立即生效
+---
+# Logic层热加载
 
-我定义了一个业务逻辑层（Logic），该层不受服务启动时扫描，会在work进程启动后进行加载，所以，可以通过server->reload接口对代码进行重载，达到热加载效果，不用频繁重启服务，以加快开发调试速度。
+> 我定义了一个业务逻辑层（Logic），该层不受服务启动时扫描，会在work进程启动后进行加载，所以，可以通过server->reload接口对代码进行重载，达到热加载效果，不用频繁重启服务，以加快开发调试速度。
 
-热加载演示步骤如下：
+操作步骤如下：
 1. 下载该仓库代码：git clone https://github.com/qiao520/hyperf-skeleton
 这个仓库代码是fork官方的骨架仓库，并修改了点东西。
-2. 下载依赖包：composer install  
+2. 下载依赖包：composer install
 注意：如果出现安装不了qiao520/swoole-logic，请先执行这个设置命令：composer config repositories.qiao520/swoole-logic vcs https://github.com/qiao520/swoole-logic
 3. 启动服务（具体自行操作）
-4. 需要先修改\vendor\hyperf\server\src\Server.php文件，增加如下方法，用来获取swoole的server，代码：
+4. 需要先修改\vendor\hyperf\server\src\Server.php文件，增加如下方法，用来获取swoole的$server，代码：
 ```
     public function getSwServer()
     {
@@ -21,13 +22,173 @@
 ```
 5. 然后给你的IDE配置启动项，新增一个“PHP HTTP Request”启动项，具体设置，自行摸索，摸索了还不行，请联系我（380552499）
 6. 启动Hyperf服务，浏览器访问http://192.168.99.100:9501/logic
-7. 修改\logic\Form\DemoForm.php逻辑代码，然后点击IDE上的run按钮（快捷键shift+f10），然后再到浏览器查看代码已重载
+7. 修改\logic\Form\DemoForm.php逻辑代码，然后点击IDE上的run按钮（快捷键shift+f10）或者浏览器请求（http://192.168.99.100:9501/reload）
+8. 然后再到浏览器访问http://192.168.99.100:9501/logic，代码已秒重载
 
-###### 表单验证组件
+# 表单验证
 
-详见：https://github.com/qiao520/swoole-logic
+组件仓库地址：https://github.com/qiao520/swoole-logic
+
+代码示例：
+
+表单Form类
+```
+<?php
+declare(strict_types=1);
+
+namespace Roers\Demo;
+
+use Roers\SwLogic\BaseForm;
+
+class DemoForm extends BaseForm
+{
+    public $name;
+    public $age;
+    public $sex;
+
+    /**
+     * 定义验证规则
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            // 验证6到30个字符的字符串
+            ['name', 'string', 'min' => 6, 'max' => 30, 'maxMinMessage' => '名字必须在{min}~{max}个字符范围内'],
+            // 验证年龄必须是整数
+            ['age', 'integer', 'min' => 18, 'max' => 100],
+            // 集合验证器，验证性别必须是1或2
+            ['sex', 'in', 'in' => [1, 2],],
+            // 使用自定义验证器，验证名字不能重复
+            ['name', 'validateName'],
+            // 还可以这样用，对多个字段用同一个验证器规则
+            [['age', 'sex'], 'integer']
+        ];
+    }
+
+    /**
+     * 字段名称映射关系
+     * @return array
+     */
+    public function attributeLabels()
+    {
+        return [
+            'name' => '名字',
+            'age' => '年龄',
+        ];
+    }
+
+    /**
+     * 业务处理
+     * @return array
+     */
+    public function handle()
+    {
+        // do something here
+
+        // 返回业务处理结果
+        return ['name' => $this->name, 'age' => $this->age];
+    }
+
+    /**
+     * 自定义验证器
+     * @param $attribute
+     * @param $options
+     * @return bool
+     */
+    public function validateName($attribute, $options)
+    {
+        $value = $this->{$attribute};
+
+        if ($value == 'Roers.cn') {
+            $this->addError($attribute, "名字{$value}已存在");
+            return false;
+        }
+
+        return true;
+    }
+}
+```
+
+demo.php
+```
+<?php
+use Roers\Demo\DemoForm;
+
+function debug($msg) {
+    echo $msg, PHP_EOL;
+}
+
+// 表单提交的数据
+$data = [
+    'name' => 'zhongdalong',
+    'age' => '31',
+    'sex' => '',
+];
+// 演示默认所有字段为非必填项
+$form = DemoForm::instance($data);
+if ($form->validate()) {
+    $result = $form->handle();
+    debug('验证通过，业务处理结果：' . json_encode($result));
+} else {
+    debug('验证不通过，错误提示信息：' .  $form->getError());
+}
+
+debug(str_repeat('-------', 10));
+
+// 演示默认所有字段为必填项
+$form = DemoForm::instance($data, true);
+if ($form->validate()) {
+    $result = $form->handle();
+    debug('验证通过，业务处理结果：' . json_encode($result));
+} else {
+    debug('验证不通过，错误提示信息：' .  $form->getError());
+}
+
+debug(str_repeat('-------', 10));
 
 
+// 演示未成年注册场景
+$data['age'] = 17;
+$form = DemoForm::instance($data);
+if ($form->validate()) {
+    $result = $form->handle();
+    debug('验证通过，业务处理结果：' . json_encode($result));
+} else {
+    debug('验证不通过，错误提示信息：' .  $form->getError());
+}
+
+debug(str_repeat('-------', 10));
+
+
+// 演示自定义验证器
+$data['age'] = 18;
+$data['name'] = 'Roers.cn';
+$form = DemoForm::instance($data);
+if ($form->validate()) {
+    $result = $form->handle();
+    debug('验证通过，业务处理结果：' . json_encode($result));
+} else {
+    debug('验证不通过，错误提示信息：' .  $form->getError());
+}
+
+debug(str_repeat('-------', 10));
+```
+
+执行结果
+```
+验证通过，业务处理结果：{"name":"zhongdalong","age":"31"}
+----------------------------------------------------------------------
+验证不通过，错误提示信息：Sex是必填项
+----------------------------------------------------------------------
+验证不通过，错误提示信息：年龄必须在18 ~ 100范围内
+----------------------------------------------------------------------
+验证不通过，错误提示信息：名字Roers.cn已存在
+----------------------------------------------------------------------
+```
+
+
+--- 
 # Hyperf介绍
 
 Hyperf 是基于 `Swoole 4.3+` 实现的高性能、高灵活性的 PHP 持久化框架，内置协程服务器及大量常用的组件，性能较传统基于 `PHP-FPM` 的框架有质的提升，提供超高性能的同时，也保持着极其灵活的可扩展性，标准组件均以最新的 [PSR 标准](https://www.php-fig.org/psr) 实现，基于强大的依赖注入设计可确保框架内的绝大部分组件或类都是可替换的。
